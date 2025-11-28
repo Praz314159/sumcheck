@@ -10,7 +10,9 @@ use rand::thread_rng;
 
 use plotters::prelude::*;
 
-use multilinear_extensions::multilinear::mle::{BCubeMapOracle, MultilinearExtension, EvaluationType};
+use multilinear_extensions::multilinear::mle::{
+    BCubeMapOracle, EvaluationType, MultilinearExtension,
+};
 use multilinear_extensions::multilinear::traits::MLE;
 
 /// Result of benchmarking a single dimension
@@ -26,8 +28,8 @@ fn bench_dimension(dim: usize, num_runs: usize, strategy: EvaluationType) -> Ben
 
     for _ in 0..num_runs {
         // Create fresh oracle for each run
-        let oracle = BCubeMapOracle::<Fr>::new_rand(dim, &mut rng)
-            .expect("Failed to create oracle");
+        let oracle =
+            BCubeMapOracle::<Fr>::new_rand(dim, &mut rng).expect("Failed to create oracle");
 
         // Create random evaluation point
         let z: Vec<Fr> = (0..dim).map(|_| Fr::rand(&mut rng)).collect();
@@ -77,7 +79,10 @@ fn generate_chart(results: &[BenchResult], title: &str, output_path: &str) {
         .unwrap();
 
     // Draw the line
-    let data: Vec<(f64, f64)> = results.iter().map(|r| (r.dim as f64, r.avg_time_ms)).collect();
+    let data: Vec<(f64, f64)> = results
+        .iter()
+        .map(|r| (r.dim as f64, r.avg_time_ms))
+        .collect();
 
     chart
         .draw_series(LineSeries::new(data.clone(), &BLUE))
@@ -87,12 +92,9 @@ fn generate_chart(results: &[BenchResult], title: &str, output_path: &str) {
 
     // Draw points
     chart
-        .draw_series(PointSeries::of_element(
-            data,
-            5,
-            &BLUE,
-            &|c, s, st| Circle::new(c, s, st.filled()),
-        ))
+        .draw_series(PointSeries::of_element(data, 5, &BLUE, &|c, s, st| {
+            Circle::new(c, s, st.filled())
+        }))
         .unwrap();
 
     chart
@@ -129,5 +131,9 @@ fn main() {
     println!();
     println!("Generating chart...");
 
-    generate_chart(&results, "MLE Naive Evaluation Time vs Dimension", "benchmark_naive.png");
+    generate_chart(
+        &results,
+        "MLE Naive Evaluation Time vs Dimension",
+        "benchmark_naive.png",
+    );
 }

@@ -1,3 +1,3 @@
-pub mod mle;
 pub mod error;
-pub mod traits; 
+pub mod mle;
+pub mod traits;
