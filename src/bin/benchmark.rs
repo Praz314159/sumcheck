@@ -88,7 +88,7 @@ fn generate_chart(results: &[BenchResult], title: &str, output_path: &str) {
         .draw_series(LineSeries::new(data.clone(), &BLUE))
         .unwrap()
         .label("Naive")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &BLUE));
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], BLUE));
 
     // Draw points
     chart
@@ -99,8 +99,8 @@ fn generate_chart(results: &[BenchResult], title: &str, output_path: &str) {
 
     chart
         .configure_series_labels()
-        .background_style(&WHITE.mix(0.8))
-        .border_style(&BLACK)
+        .background_style(WHITE.mix(0.8))
+        .border_style(BLACK)
         .label_font(("sans-serif", 28))
         .draw()
         .unwrap();

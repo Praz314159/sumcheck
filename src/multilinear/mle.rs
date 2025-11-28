@@ -142,7 +142,7 @@ impl<F: Field, M: BCubeMap<F>> MultilinearExtension<F, M> {
         }
         // iterate over map to compute MLE_f(b)
         self.oracle.iter().try_fold(F::zero(), |acc, (b, &f_b)| {
-            let chi = eq(&b, z)?;
+            let chi = eq(b, z)?;
             Ok(acc + f_b * chi)
         })
     }
@@ -178,7 +178,7 @@ impl<F: Field, M: BCubeMap<F>> MLE<F, M> for MultilinearExtension<F, M> {
 /// from any b and z
 pub fn eq<F: Field>(b: &[F], z: &[F]) -> Result<F, MLEError> {
     // check if dimension mismatch
-    if !(b.len() == z.len()) {
+    if b.len() != z.len() {
         return Err(MLEError::InconsistentDimensions {
             b_dim: b.len(),
             z_dim: z.len(),
