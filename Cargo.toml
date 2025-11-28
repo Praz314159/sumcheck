@@ -1,0 +1,12 @@
+[package]
+name = "multilinear_extensions"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ark-ff = "0.4"
+hashbrown = "0.15"
+thiserror = "1.0"
+rand = "0.8"
+ark-test-curves = { version = "0.4", features = ["bls12_381_curve"] }
+plotters = "0.3"
