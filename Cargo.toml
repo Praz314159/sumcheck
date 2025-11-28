@@ -10,3 +10,7 @@ thiserror = "1.0"
 rand = "0.8"
 ark-test-curves = { version = "0.4", features = ["bls12_381_curve"] }
 plotters = "0.3"
+dhat = { version = "0.3", optional = true }
+
+[features]
+dhat-heap = ["dhat"]

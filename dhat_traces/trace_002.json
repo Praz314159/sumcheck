@@ -1,0 +1,143 @@
+{
+"dhatFileVersion": 2,
+"mode": "rust-heap",
+"verb": "Allocated",
+"bklt": true,
+"bkacc": false,
+"tu": "µs",
+"Mtu": "s",
+"tuth": 10,
+"cmd": "/Users/prashanth/Desktop/Research/cryptography/multilinear/MLE/target/release/profile_memory",
+"pid": 63904,
+"tg": 5009,
+"te": 41528,
+"pps": [
+{
+"tb": 352,
+"tbk": 1,
+"tl": 41366,
+"mb": 352,
+"mbk": 1,
+"gb": 352,
+"gbk": 1,
+"eb": 352,
+"ebk": 1,
+"fs": [
+1,
+2,
+3,
+4
+]
+},
+{
+"tb": 64,
+"tbk": 1,
+"tl": 41417,
+"mb": 64,
+"mbk": 1,
+"gb": 64,
+"gbk": 1,
+"eb": 64,
+"ebk": 1,
+"fs": [
+1,
+5,
+6,
+7,
+8,
+9
+]
+},
+{
+"tb": 64,
+"tbk": 1,
+"tl": 41344,
+"mb": 64,
+"mbk": 1,
+"gb": 64,
+"gbk": 1,
+"eb": 64,
+"ebk": 1,
+"fs": [
+1,
+10,
+11,
+12,
+13,
+3,
+4
+]
+},
+{
+"tb": 512,
+"tbk": 1,
+"tl": 36518,
+"mb": 512,
+"mbk": 1,
+"gb": 512,
+"gbk": 1,
+"eb": 0,
+"ebk": 0,
+"fs": [
+1,
+14
+]
+},
+{
+"tb": 2097152,
+"tbk": 1,
+"tl": 41311,
+"mb": 2097152,
+"mbk": 1,
+"gb": 2097152,
+"gbk": 1,
+"eb": 0,
+"ebk": 0,
+"fs": [
+1,
+15
+]
+},
+{
+"tb": 1024,
+"tbk": 1,
+"tl": 41434,
+"mb": 1024,
+"mbk": 1,
+"gb": 1024,
+"gbk": 1,
+"eb": 1024,
+"ebk": 1,
+"fs": [
+1,
+16,
+17,
+18,
+19,
+9
+]
+}
+],
+"ftbl": [
+"[root]",
+"0x104a6c1d8: <dhat::Alloc as core::alloc::global::GlobalAlloc>::alloc (???:0:0)",
+"0x104ad6ef8: std::sys::thread_local::native::lazy::Storage<T,D>::get_or_init_slow (???:0:0)",
+"0x104a9f564: rand::rngs::thread::thread_rng (???:0:0)",
+"0x104a663ec: profile_memory::main (???:0:0)",
+"0x104ad7910: std::sys::sync::once_box::OnceBox<T>::initialize (???:0:0)",
+"0x104aa7ad4: std::io::stdio::Stderr::lock (???:0:0)",
+"0x104ac1030: <&std::io::stdio::Stdout as std::io::Write>::write_fmt (???:0:0)",
+"0x104aa7b3c: std::io::stdio::_print (???:0:0)",
+"0x104a663e0: profile_memory::main (???:0:0)",
+"0x104adabe0: alloc::raw_vec::finish_grow (???:0:0)",
+"0x104ab96fc: alloc::raw_vec::RawVec<T,A>::grow_one (???:0:0)",
+"0x104aa8c7c: std::sys::thread_local::destructors::list::register (???:0:0)",
+"0x104ad6eac: std::sys::thread_local::native::lazy::Storage<T,D>::get_or_init_slow (???:0:0)",
+"0x104a66578: profile_memory::main (???:0:0)",
+"0x104a664e4: profile_memory::main (???:0:0)",
+"0x104aac39c: std::sync::poison::once::Once::call_once_force::{{closure}} (???:0:0)",
+"0x104ad7734: std::sys::sync::once::queue::Once::call (???:0:0)",
+"0x104ad7a60: std::sync::once_lock::OnceLock<T>::initialize (???:0:0)",
+"0x104aa7b54: std::io::stdio::_print (???:0:0)"
+]
+}

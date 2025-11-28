@@ -1,0 +1,3 @@
+[alias]
+profile-memory = "run --bin profile_memory --release --features dhat-heap"
+benchmark = "run --bin benchmark --release"

@@ -2,6 +2,7 @@
 //!
 //! Measures evaluation time across different dimensions and generates plots.
 
+use std::fs;
 use std::time::{Duration, Instant};
 
 use ark_ff::UniformRand;
@@ -10,9 +11,7 @@ use rand::thread_rng;
 
 use plotters::prelude::*;
 
-use multilinear_extensions::multilinear::mle::{
-    BCubeMapOracle, EvaluationType, MultilinearExtension,
-};
+use multilinear_extensions::multilinear::mle::{DenseOracle, EvaluationType, MultilinearExtension};
 use multilinear_extensions::multilinear::traits::MLE;
 
 /// Result of benchmarking a single dimension
@@ -28,8 +27,7 @@ fn bench_dimension(dim: usize, num_runs: usize, strategy: EvaluationType) -> Ben
 
     for _ in 0..num_runs {
         // Create fresh oracle for each run
-        let oracle =
-            BCubeMapOracle::<Fr>::new_rand(dim, &mut rng).expect("Failed to create oracle");
+        let oracle = DenseOracle::<Fr>::new_rand(dim, &mut rng);
 
         // Create random evaluation point
         let z: Vec<Fr> = (0..dim).map(|_| Fr::rand(&mut rng)).collect();
@@ -110,14 +108,46 @@ fn generate_chart(results: &[BenchResult], title: &str, output_path: &str) {
     println!("Chart saved to {}", output_path);
 }
 
+/// Find the next available benchmark number in benchmarks/
+fn next_benchmark_number() -> u32 {
+    let bench_dir = "benchmarks";
+
+    if fs::create_dir_all(bench_dir).is_err() {
+        return 1;
+    }
+
+    let mut max_num = 0u32;
+    if let Ok(entries) = fs::read_dir(bench_dir) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
+            // Parse benchmark_XXX.png
+            if let Some(num_str) = name_str
+                .strip_prefix("benchmark_")
+                .and_then(|s| s.strip_suffix(".png"))
+            {
+                if let Ok(num) = num_str.parse::<u32>() {
+                    max_num = max_num.max(num);
+                }
+            }
+        }
+    }
+
+    max_num + 1
+}
+
 fn main() {
     let min_dim = 4;
     let max_dim = 20;
     let num_runs = 5;
 
+    let bench_num = next_benchmark_number();
+    let output_path = format!("benchmarks/benchmark_{:03}.png", bench_num);
+
     println!("Benchmarking MLE evaluation (Naive algorithm)");
     println!("Dimensions: {} to {}", min_dim, max_dim);
     println!("Runs per dimension: {}", num_runs);
+    println!("Output: {}", output_path);
     println!();
 
     let mut results = Vec::new();
@@ -134,6 +164,6 @@ fn main() {
     generate_chart(
         &results,
         "MLE Naive Evaluation Time vs Dimension",
-        "benchmark_naive.png",
+        &output_path,
     );
 }

@@ -9,96 +9,18 @@
 //! Once these are implemented, we can profile.
 
 use ark_ff::{Field, UniformRand};
-use hashbrown::HashMap;
 use rand::Rng;
-use std::collections::HashSet;
 use std::marker::PhantomData;
 
 use super::error::{MLEError, OracleError};
 use super::traits::{BCubeMap, MLE};
 
-/// mapping accessible as an oracle
-pub struct BCubeMapOracle<F: Field> {
-    // dimension >= 2
-    pub dim: usize,
-
-    // Hashmap of bitstrings of length dim to field element. There are a couple of ways
-    // we can represent these bitstrings. But for now, I think the thing to do is represent
-    // these as byte vectors.
-    pub map: HashMap<Vec<F>, F>,
+/// Dense oracle - stores values in a Vec indexed by integer representation of boolean points
+/// This is memory-efficient: only stores 2^dim field elements, no key storage
+pub struct DenseOracle<F: Field> {
+    dim: usize,
+    values: Vec<F>,
 }
-
-impl<F: Field> BCubeMapOracle<F> {
-    // basic constructor
-    pub fn new(dim: usize, map: HashMap<Vec<F>, F>) -> Result<BCubeMapOracle<F>, OracleError> {
-        // define boolean elements in field
-        let b = HashSet::from([F::zero(), F::one()]);
-
-        // check size of map
-        let npoints = 1 << dim;
-        if map.len() != npoints {
-            return Err(OracleError::IncorrectOracleSize);
-        }
-
-        // check that the map is from {0,1}^dim
-        for (point, _) in &map {
-            // check dimension
-            if point.len() != dim {
-                return Err(OracleError::IncorrectOraclePointDimension {
-                    expected: dim,
-                    found: point.len(),
-                });
-            }
-
-            // check all coordinates are boolean
-            if !point.iter().all(|elt| b.contains(elt)) {
-                return Err(OracleError::NonbooleanOraclePoint);
-            }
-        }
-
-        Ok(BCubeMapOracle { dim, map })
-    }
-
-    pub fn new_rand<R: Rng>(dim: usize, rng: &mut R) -> Result<BCubeMapOracle<F>, OracleError>
-    where
-        F: UniformRand,
-    {
-        // generate random field 2^dim random field elements
-        let num_points = 1 << dim;
-
-        // initialize hashmap of correct size
-        let mut map: HashMap<Vec<F>, F> = HashMap::with_capacity(num_points);
-
-        // construct hashmap
-        for n in 0..num_points {
-            let bcube_elt = to_bcube_elt(dim, n);
-            let field_elt = F::rand(rng);
-
-            map.insert(bcube_elt, field_elt);
-        }
-
-        Self::new(dim, map)
-    }
-}
-
-impl<F: Field> BCubeMap<F> for BCubeMapOracle<F> {
-    // impl query on hashmap
-    fn query(&self, point: &[F]) -> Result<F, OracleError> {
-        // Look up point
-        self.map
-            .get(point)
-            .copied()
-            .ok_or(OracleError::PointNotFound)
-    }
-
-    // impl iter
-    fn iter(&self) -> impl Iterator<Item = (&Vec<F>, &F)> {
-        self.map.iter()
-    }
-}
-
-// Now we have a map we can query. We want multiple different MLEs that use it
-// in order to evaluate differently.
 
 /// Different algorithms for evaluating the multilinear extension
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -117,7 +39,52 @@ pub struct MultilinearExtension<F: Field, M: BCubeMap<F>> {
     _phantom: PhantomData<F>,
 }
 
-/// implementation
+/// Implementations
+impl<F: Field> DenseOracle<F> {
+    /// Create from a vector of values
+    /// values[i] corresponds to the boolean point to_bcube_elt(dim, i)
+    pub fn new(dim: usize, values: Vec<F>) -> Result<DenseOracle<F>, OracleError> {
+        let expected_len = 1 << dim;
+
+        if values.len() != expected_len {
+            return Err(OracleError::IncorrectOracleSize);
+        }
+
+        Ok(DenseOracle { dim, values })
+    }
+
+    /// Create with random values
+    pub fn new_rand<R: Rng>(dim: usize, rng: &mut R) -> DenseOracle<F>
+    where
+        F: UniformRand,
+    {
+        let num_points = 1 << dim;
+        let values: Vec<F> = (0..num_points).map(|_| F::rand(rng)).collect();
+        DenseOracle { dim, values }
+    }
+}
+
+impl<F: Field> BCubeMap<F> for DenseOracle<F> {
+    fn dim(&self) -> usize {
+        self.dim
+    }
+
+    fn query(&self, index: usize) -> Result<F, OracleError> {
+        self.values
+            .get(index)
+            .copied()
+            .ok_or(OracleError::PointNotFound)
+    }
+
+    fn iter(&self) -> impl Iterator<Item = (usize, &F)> {
+        self.values.iter().enumerate()
+    }
+}
+
+// Now we have a map we can query. We want multiple different MLEs that use it
+// in order to evaluate differently.
+
+/// implement MLE
 impl<F: Field, M: BCubeMap<F>> MultilinearExtension<F, M> {
     // constructor
     pub fn new(oracle: M, dim: usize, strategy: EvaluationType) -> Self {
@@ -130,7 +97,7 @@ impl<F: Field, M: BCubeMap<F>> MultilinearExtension<F, M> {
     }
 
     // the naive evaluation computes eq(b, z) for all
-    // b in B^w in a brute force manner. Then sums the produc
+    // b in B^w in a brute force manner. Then sums the product
     // of the map query with the multivariate lagrange basis
     fn naive(&self, z: &[F]) -> Result<F, MLEError> {
         // check that z has the right dimension
@@ -140,11 +107,20 @@ impl<F: Field, M: BCubeMap<F>> MultilinearExtension<F, M> {
                 found: z.len(),
             });
         }
-        // iterate over map to compute MLE_f(b)
-        self.oracle.iter().try_fold(F::zero(), |acc, (b, &f_b)| {
-            let chi = eq(b, z)?;
-            Ok(acc + f_b * chi)
-        })
+// iterate over map to compute MLE_f(z)
+        let one_minus_z: Vec<F> = z
+            .iter()
+            .map(|z_i| F::one() - z_i)
+            .collect();
+        
+        Ok(self
+            .oracle
+            .iter()
+            .map(|(i, &f_b)| {
+                let chi = eq(self.dim, i, z, &one_minus_z);
+                f_b * chi
+            })
+            .sum())
     }
 
     fn zhu(&self, _z: &[F]) -> Result<F, MLEError> {
@@ -174,34 +150,18 @@ impl<F: Field, M: BCubeMap<F>> MLE<F, M> for MultilinearExtension<F, M> {
     }
 }
 
-/// helper function to compute multivariate lagrange basis polynomial
-/// from any b and z
-pub fn eq<F: Field>(b: &[F], z: &[F]) -> Result<F, MLEError> {
-    // check if dimension mismatch
-    if b.len() != z.len() {
-        return Err(MLEError::InconsistentDimensions {
-            b_dim: b.len(),
-            z_dim: z.len(),
-        });
-    }
-
-    Ok(b.iter()
-        .zip(z.iter())
-        .map(|(&b, &z)| b * z + (F::one() - b) * (F::one() - z))
-        .product())
-}
-
-/// helper function that takes an int and returns the
-/// boolean hypercube element, where the hypercube is a
-/// subset of F^dim
-pub fn to_bcube_elt<F: Field>(dim: usize, n: usize) -> Vec<F> {
+/// Compute eq(b, z) where b is represented by index
+/// index represents the boolean point b where bit i of index gives b_i
+/// Returns the multivariate Lagrange basis polynomial evaluated at z
+/// one_minus_z should be precomputed as (1 - z[i]) for each i
+pub fn eq<F: Field>(dim: usize, index: usize, z: &[F], one_minus_z: &[F]) -> F {
     (0..dim)
         .map(|i| {
-            if (n >> i) & 1 == 1 {
-                F::one()
+            if (index >> i) & 1 == 1 {
+                z[i]
             } else {
-                F::zero()
+                one_minus_z[i]
             }
         })
-        .collect()
+        .product()
 }

@@ -10,15 +10,14 @@ use ark_ff::Field;
 /// be an evaluation or it can literally be a mapping that is
 /// queried as an oracle in constant time.
 pub trait BCubeMap<F: Field> {
-    // query takes a point b in F^w, and returns the evaluation
-    // f(b) in F. One thing here is that b is actually in {0,1}^w.
-    // Ideally, we don't actually need to represent these as field
-    // elements, but in the beginning we probably can.
-    fn query(&self, b: &[F]) -> Result<F, OracleError>;
+    // dimension of the boolean hypercube
+    fn dim(&self) -> usize;
 
-    // return iterator so points of the boolean hypercube don't have
-    // to be reconstructed in order to be queried
-    fn iter(&self) -> impl Iterator<Item = (&Vec<F>, &F)>;
+    // query by index i, returns f(to_bcube_elt(dim, i))
+    fn query(&self, index: usize) -> Result<F, OracleError>;
+
+    // iterate over (index, &value) pairs
+    fn iter(&self) -> impl Iterator<Item = (usize, &F)>;
 }
 
 /// This is a multilinear extension of a mapping from the boolean

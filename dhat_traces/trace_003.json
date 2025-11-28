@@ -1,0 +1,165 @@
+{
+"dhatFileVersion": 2,
+"mode": "rust-heap",
+"verb": "Allocated",
+"bklt": true,
+"bkacc": false,
+"tu": "µs",
+"Mtu": "s",
+"tuth": 10,
+"cmd": "target/release/profile_memory",
+"pid": 67983,
+"tg": 5193,
+"te": 37892,
+"pps": [
+{
+"tb": 512,
+"tbk": 1,
+"tl": 32628,
+"mb": 512,
+"mbk": 1,
+"gb": 512,
+"gbk": 1,
+"eb": 0,
+"ebk": 0,
+"fs": [
+1,
+2,
+3
+]
+},
+{
+"tb": 2097152,
+"tbk": 1,
+"tl": 37714,
+"mb": 2097152,
+"mbk": 1,
+"gb": 2097152,
+"gbk": 1,
+"eb": 0,
+"ebk": 0,
+"fs": [
+1,
+4,
+5
+]
+},
+{
+"tb": 352,
+"tbk": 1,
+"tl": 37756,
+"mb": 352,
+"mbk": 1,
+"gb": 352,
+"gbk": 1,
+"eb": 352,
+"ebk": 1,
+"fs": [
+1,
+6,
+7,
+8
+]
+},
+{
+"tb": 1024,
+"tbk": 1,
+"tl": 37812,
+"mb": 1024,
+"mbk": 1,
+"gb": 1024,
+"gbk": 1,
+"eb": 1024,
+"ebk": 1,
+"fs": [
+1,
+9,
+10,
+11,
+12,
+13
+]
+},
+{
+"tb": 64,
+"tbk": 1,
+"tl": 37797,
+"mb": 64,
+"mbk": 1,
+"gb": 64,
+"gbk": 1,
+"eb": 64,
+"ebk": 1,
+"fs": [
+1,
+14,
+15,
+16,
+17,
+13
+]
+},
+{
+"tb": 64,
+"tbk": 1,
+"tl": 37737,
+"mb": 64,
+"mbk": 1,
+"gb": 64,
+"gbk": 1,
+"eb": 64,
+"ebk": 1,
+"fs": [
+1,
+18,
+19,
+20,
+21,
+7,
+8
+]
+},
+{
+"tb": 512,
+"tbk": 1,
+"tl": 32722,
+"mb": 512,
+"mbk": 1,
+"gb": 512,
+"gbk": 1,
+"eb": 0,
+"ebk": 0,
+"fs": [
+1,
+22,
+23
+]
+}
+],
+"ftbl": [
+"[root]",
+"0x100e582c0: <dhat::Alloc as core::alloc::global::GlobalAlloc>::alloc (???:0:0)",
+"0x100e53894: <alloc::vec::Vec<T> as alloc::vec::spec_from_iter::SpecFromIter<T,I>>::from_iter (???:0:0)",
+"0x100e524f8: profile_memory::main (???:0:0)",
+"0x100e5365c: <alloc::vec::Vec<T> as alloc::vec::spec_from_iter::SpecFromIter<T,I>>::from_iter (???:0:0)",
+"0x100e5246c: profile_memory::main (???:0:0)",
+"0x100ec2eb8: std::sys::thread_local::native::lazy::Storage<T,D>::get_or_init_slow (???:0:0)",
+"0x100e8b64c: <rand::rngs::thread::ThreadRng as core::default::Default>::default (???:0:0)",
+"0x100e5239c: profile_memory::main (???:0:0)",
+"0x100e9835c: std::sync::poison::once::Once::call_once_force::{{closure}} (???:0:0)",
+"0x100ec36f4: std::sys::sync::once::queue::Once::call (???:0:0)",
+"0x100ec3a20: std::sync::once_lock::OnceLock<T>::initialize (???:0:0)",
+"0x100e93c3c: std::io::stdio::_print (???:0:0)",
+"0x100e52390: profile_memory::main (???:0:0)",
+"0x100ec38d0: std::sys::sync::once_box::OnceBox<T>::initialize (???:0:0)",
+"0x100e93bbc: std::io::stdio::Stdout::lock (???:0:0)",
+"0x100eacff0: <&std::io::stdio::Stdout as std::io::Write>::write_fmt (???:0:0)",
+"0x100e93c24: std::io::stdio::_print (???:0:0)",
+"0x100ec6ba0: alloc::raw_vec::finish_grow (???:0:0)",
+"0x100ea56bc: alloc::raw_vec::RawVec<T,A>::grow_one (???:0:0)",
+"0x100e94d64: std::sys::thread_local::destructors::list::register (???:0:0)",
+"0x100ec2e6c: std::sys::thread_local::native::lazy::Storage<T,D>::get_or_init_slow (???:0:0)",
+"0x100e53788: <alloc::vec::Vec<T> as alloc::vec::spec_from_iter::SpecFromIter<T,I>>::from_iter (???:0:0)",
+"0x100e52494: profile_memory::main (???:0:0)"
+]
+}
